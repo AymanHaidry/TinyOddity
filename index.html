@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#05060a">
+  <meta name="description" content="TinyOddity — Complete things. Discover things. Build a universe.">
+  <title>TinyOddity — Cosmic Research Instrument</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🪐%3C/text%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body id="app-body">
+  <!-- ==================== PRELOADER ==================== -->
+  <div class="preloader" id="preloader">
+    <div class="preloader-inner">
+      <div class="preloader-logo">🪐 TinyOddity</div>
+      <div class="preloader-sub">Initializing Universe</div>
+      <div class="preloader-bar"><div class="preloader-bar-fill"></div></div>
+    </div>
+  </div>
+
+  <!-- ==================== COSMIC BACKGROUND (from index 1 - the rich one) ==================== -->
+  <div class="mw-space">
+    <div class="mw-stars"></div>
+    <div class="mw-galaxy"></div>
+    <div class="mw-dust"></div>
+    <div class="mw-core"></div>
+    <div class="mw-star-cloud"></div>
+    <div class="mw-nebula one"></div>
+    <div class="mw-nebula two"></div>
+    <div class="mw-nebula three"></div>
+    <div class="mw-vignette"></div>
+  </div>
+  <div class="galaxy"></div>
+  <div class="galaxy"></div>
+  <div class="blackhole"></div>
+  <div class="nebula"></div>
+  <div class="grain"></div>
+  <div class="stars" id="stars"><div class="orb a"></div><div class="orb b"></div></div>
+  <canvas class="stars-canvas" id="starsCanvas"></canvas>
+
+  <!-- Keep original starfield canvas for JS compatibility -->
+  <div class="cosmic-bg">
+    <canvas id="starfield" class="starfield-canvas"></canvas>
+    <div class="nebula-glow nebula-1"></div>
+    <div class="nebula-glow nebula-2"></div>
+    <div class="nebula-glow nebula-3"></div>
+    <div class="vignette"></div>
+  </div>
+
+  <!-- ==================== OFFLINE BADGE ==================== -->
+  <div class="offline-badge" id="offlineBadge">
+    <i class="bi bi-wifi-off"></i> Offline · Local Mode
+  </div>
+
+  <!-- ==================== RIPPLE CONTAINER ==================== -->
+  <div class="ripple-container" id="rippleContainer"></div>
+
+  <!-- ==================== APP CONTAINER ==================== -->
+  <div class="app-container">
+
+    <!-- Top Navigation -->
+    <nav class="top-nav liquid-glass-strong" id="topNav">
+      <div class="nav-brand" onclick="router.navigate('home')">
+        🪐 TinyOddity
+      </div>
+      <ul class="nav-links">
+        <li><button class="nav-link active" data-page="home" onclick="router.navigate('home')">Home</button></li>
+        <li><button class="nav-link" data-page="study" onclick="router.navigate('study')">Study</button></li>
+        <li><button class="nav-link" data-page="collection" onclick="router.navigate('collection')">Collection</button></li>
+        <li><button class="nav-link" data-page="universe" onclick="router.navigate('universe')">Universe</button></li>
+        <li><button class="nav-link" data-page="discover" onclick="router.navigate('discover')">Discover</button></li>
+      </ul>
+      <div class="nav-actions">
+        <div class="search-bar" id="globalSearchBar">
+          <i class="bi bi-search"></i>
+          <input type="text" placeholder="Search cosmos..." id="globalSearchInput" oninput="search.handleInput(this.value)">
+          <div class="search-dropdown" id="searchDropdown"></div>
+        </div>
+        <button class="nav-btn" onclick="router.navigate('profile')" title="Profile"><i class="bi bi-person"></i></button>
+        <button class="nav-btn" onclick="app.exportData()" title="Export"><i class="bi bi-download"></i></button>
+      </div>
+    </nav>
+
+    <!-- ==================== HOME PAGE ==================== -->
+    <section class="page active" id="page-home">
+      <header class="page-header">
+        <h1 class="greeting" id="greeting">Good evening, Explorer</h1>
+        <p class="greeting-sub" id="greeting-sub">Your attention builds worlds.</p>
+        <p class="cosmic-whisper" id="cosmic-whisper">The cosmos has been waiting for you.</p>
+      </header>
+
+      <div class="dashboard-grid">
+        <div class="dashboard-card liquid-glass wide">
+          <div class="card-header">
+            <span class="card-label">Today's Missions</span>
+            <span class="card-count" id="home-task-count">0</span>
+          </div>
+          <div class="task-preview" id="home-tasks-preview">
+            <div class="empty-poem">The cosmos is patient. Create a task to begin.</div>
+          </div>
+          <button class="btn-primary" onclick="router.navigate('study')">
+            <i class="bi bi-arrow-right"></i> View All Missions
+          </button>
+        </div>
+
+        <div class="dashboard-card liquid-glass">
+          <div class="card-label">Universe</div>
+          <div class="dashboard-value" id="home-universe-count">0</div>
+          <div class="card-sublabel">Cosmic Objects</div>
+        </div>
+
+        <div class="dashboard-card liquid-glass">
+          <div class="card-label">Discoveries</div>
+          <div class="dashboard-value" id="home-discovery-count">0</div>
+          <div class="card-sublabel">Total Found</div>
+        </div>
+
+        <div class="dashboard-card liquid-glass wide">
+          <div class="card-label">Latest Discovery</div>
+          <div class="latest-discovery" id="home-latest-discovery">
+            <div class="discovery-placeholder">
+              <i class="bi bi-stars"></i>
+              <div>
+                <div class="placeholder-title">Nothing yet</div>
+                <div class="placeholder-sub">Complete a mission to discover something impossible</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== STUDY PAGE ==================== -->
+    <section class="page" id="page-study">
+      <header class="page-header">
+        <h1 class="page-title" id="study-title">Study</h1>
+        <p class="page-subtitle" id="study-subtitle">Complete missions to receive gifts from the cosmos.</p>
+      </header>
+
+      <div class="study-toolbar">
+        <div class="toolbar-left">
+          <button class="btn-primary" onclick="app.openAddTaskModal()">
+            <i class="bi bi-plus-lg"></i> New Mission
+          </button>
+          <button class="btn-secondary" onclick="app.clearCompleted()">
+            <i class="bi bi-check-all"></i> Clear Completed
+          </button>
+        </div>
+        <div class="toolbar-right" id="task-stats">0 missions · 0 completed</div>
+      </div>
+
+      <div class="task-list" id="task-list"></div>
+    </section>
+
+    <!-- ==================== COLLECTION PAGE ==================== -->
+    <section class="page" id="page-collection">
+      <header class="page-header">
+        <h1 class="page-title" id="collection-title">Collection</h1>
+        <p class="page-subtitle" id="collection-subtitle">Everything you've discovered. <span class="cosmic-love">Each object remembers you.</span></p>
+      </header>
+
+      <div class="collection-filters" id="collection-filters">
+        <button class="filter-chip active" data-filter="all" onclick="collection.setFilter('all')">
+          <i class="bi bi-stars"></i> All Things
+        </button>
+        <button class="filter-chip" data-filter="buildings" onclick="collection.setFilter('buildings')">
+          <i class="bi bi-building"></i> Structures
+        </button>
+        <button class="filter-chip" data-filter="oddities" onclick="collection.setFilter('oddities')">
+          <i class="bi bi-bullseye"></i> Oddities
+        </button>
+        <button class="filter-chip" data-filter="media" onclick="collection.setFilter('media')">
+          <i class="bi bi-disc"></i> Media
+        </button>
+        <button class="filter-chip" data-filter="tinyhumans" onclick="collection.setFilter('tinyhumans')">
+          <i class="bi bi-person"></i> Beings
+        </button>
+        <button class="filter-chip" data-filter="worlds" onclick="collection.setFilter('worlds')">
+          <i class="bi bi-globe"></i> Worlds
+        </button>
+        <button class="filter-chip" data-filter="objects" onclick="collection.setFilter('objects')">
+          <i class="bi bi-box-seam"></i> Objects
+        </button>
+      </div>
+
+      <div class="collection-grid" id="collection-grid"></div>
+    </section>
+
+    <!-- ==================== UNIVERSE PAGE ==================== -->
+    <section class="page" id="page-universe">
+      <header class="page-header">
+        <h1 class="page-title" id="universe-title">Universe</h1>
+        <p class="page-subtitle" id="universe-subtitle">This is your world. Arrange it as you dream.</p>
+      </header>
+
+      <div class="universe-wrap">
+        <div class="universe-canvas-wrap universe-container liquid-glass" id="universe-container">
+          <canvas id="universe-canvas"></canvas>
+          <div class="universe-hint" id="universe-hint">
+            <i class="bi bi-info-circle"></i> Click tray items to place · Drag to move · Double-click to remove
+          </div>
+          <button class="universe-clear" onclick="universe.clear()">
+            <i class="bi bi-trash3"></i> Clear Cosmos
+          </button>
+        </div>
+
+        <div class="universe-tray liquid-glass" id="universe-tray"></div>
+      </div>
+    </section>
+
+    <!-- ==================== DISCOVER PAGE ==================== -->
+    <section class="page" id="page-discover">
+      <header class="page-header">
+        <h1 class="page-title" id="discover-title">Discover</h1>
+        <p class="page-subtitle" id="discover-subtitle">Every explorer leaves a trail of light.</p>
+      </header>
+
+      <div class="discover-search-wrap">
+        <div class="search-box liquid-glass" style="padding:4px 4px 4px 16px;">
+          <i class="bi bi-search"></i>
+          <input type="text" placeholder="Search explorers, objects, or lore..." id="discoverSearch" oninput="discoverPage.handleSearch(this.value)">
+        </div>
+      </div>
+
+      <div class="discover-section-title">Featured Explorers</div>
+      <div class="discover-grid" id="discover-grid"></div>
+    </section>
+
+    <!-- ==================== PROFILE PAGE ==================== -->
+    <section class="page" id="page-profile">
+      <header class="page-header">
+        <h1 class="page-title" id="profile-title">Profile</h1>
+        <p class="page-subtitle" id="profile-subtitle">You are stardust, organizing itself.</p>
+      </header>
+
+      <div class="profile-header liquid-glass">
+        <div class="profile-avatar" id="profile-avatar">
+          <i class="bi bi-stars"></i>
+        </div>
+        <div class="profile-info">
+          <div class="profile-name" id="profile-name">Explorer</div>
+          <div class="profile-universe" id="profile-universe-name">The Microverse</div>
+          <div class="profile-bio" id="profile-bio">Building a universe, one task at a time.</div>
+        </div>
+      </div>
+
+      <div class="profile-stats" id="profile-stats">
+        <div class="stat-card liquid-glass">
+          <div class="stat-value" id="stat-tasks">0</div>
+          <div class="stat-label">Missions Completed</div>
+        </div>
+        <div class="stat-card liquid-glass">
+          <div class="stat-value" id="stat-items">0</div>
+          <div class="stat-label">Cosmic Objects</div>
+        </div>
+        <div class="stat-card liquid-glass">
+          <div class="stat-value" id="stat-rare">0</div>
+          <div class="stat-label">Rare & Above</div>
+        </div>
+        <div class="stat-card liquid-glass">
+          <div class="stat-value" id="stat-time">0h</div>
+          <div class="stat-label">Hours of Focus</div>
+        </div>
+      </div>
+
+      <div class="profile-section">
+        <h2 class="section-title">Settings</h2>
+        <div class="liquid-glass settings-panel">
+          <div class="settings-group">
+            <div class="settings-item">
+              <div>
+                <div class="settings-label">Sound Effects</div>
+                <div class="settings-desc">Play sounds on discoveries</div>
+              </div>
+              <button class="toggle" id="setting-sound" onclick="app.toggleSetting('sound')"></button>
+            </div>
+            <div class="settings-item">
+              <div>
+                <div class="settings-label">Rarity Glow</div>
+                <div class="settings-desc">Highlight rare items in collection</div>
+              </div>
+              <button class="toggle active" id="setting-glow" onclick="app.toggleSetting('glow')"></button>
+            </div>
+            <div class="settings-item">
+              <div>
+                <div class="settings-label">Auto-sync</div>
+                <div class="settings-desc">Sync with cloud when available</div>
+              </div>
+              <button class="toggle active" id="setting-sync" onclick="app.toggleSetting('sync')"></button>
+            </div>
+            <div class="settings-item">
+              <div>
+                <div class="settings-label">Lite Mode</div>
+                <div class="settings-desc">Disable animations, glowing effects, and heavy blur for better performance</div>
+              </div>
+              <button class="toggle" id="setting-lite" onclick="app.toggleSetting('lite')"></button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-section">
+        <h2 class="section-title">Public Identity</h2>
+        <div class="liquid-glass settings-panel">
+          <!-- Banner -->
+          <div class="profile-banner-wrap">
+            <div class="profile-banner" id="profile-banner"></div>
+            <button class="profile-banner-btn" onclick="document.getElementById('banner-upload').click()" title="Change Banner">
+              <i class="bi bi-camera"></i>
+            </button>
+          </div>
+          <input type="file" id="banner-upload" accept="image/*" style="display:none" onchange="app.handleBannerUpload(event)">
+
+          <!-- PFP Row -->
+          <div class="profile-avatar-row">
+            <div class="profile-avatar" id="profile-avatar"></div>
+            <div class="profile-avatar-actions">
+              <button class="btn-secondary" onclick="document.getElementById('pfp-upload').click()">
+                <i class="bi bi-camera"></i> Change Photo
+              </button>
+              <button class="btn-secondary" onclick="app.clearPfp()">
+                <i class="bi bi-trash3"></i> Reset
+              </button>
+            </div>
+          </div>
+          <input type="file" id="pfp-upload" accept="image/*" style="display:none" onchange="app.handlePfpUpload(event)">
+
+          <!-- Handle -->
+          <div class="form-group">
+            <label class="form-label">Cosmic Handle</label>
+            <div class="handle-input-wrap">
+              <span class="handle-prefix">@</span>
+              <input id="pub-handle" class="form-input" placeholder="your_handle" style="padding-left:28px;">
+            </div>
+            <div class="handle-status" id="handle-status">Unique across the multiverse</div>
+          </div>
+
+          <!-- Name & Universe -->
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Display Name</label>
+              <input id="pub-name" class="form-input" placeholder="How the cosmos knows you">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Universe Name</label>
+              <input id="pub-universe" class="form-input" placeholder="Name your world">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Bio</label>
+            <textarea id="pub-bio" class="form-textarea" placeholder="Tell the multiverse who you are..."></textarea>
+          </div>
+
+          <!-- Verification -->
+          <div class="settings-item" style="margin-top:8px;">
+            <div>
+              <div class="settings-label">Verified Explorer <span class="verified-badge" id="profile-verified-preview"><i class="bi bi-patch-check-fill"></i></span></div>
+              <div class="settings-desc">Display verification badge on your profile</div>
+            </div>
+            <button class="toggle" id="setting-verified" onclick="app.toggleSetting('verified')"></button>
+          </div>
+
+          <div class="form-group" style="margin-top:16px;">
+            <label class="form-label">Cosmic Signature</label>
+            <div class="accent-picker">
+              <button onclick="app.setAccent('#65e9ff')" style="background:#65e9ff"></button>
+              <button onclick="app.setAccent('#b46cff')" style="background:#b46cff"></button>
+              <button onclick="app.setAccent('#ff5ac8')" style="background:#ff5ac8"></button>
+              <button onclick="app.setAccent('#ffb76b')" style="background:#ffb76b"></button>
+              <button onclick="app.setAccent('#c7ff75')" style="background:#c7ff75"></button>
+              <button onclick="app.setAccent('#7b7cff')" style="background:#7b7cff"></button>
+            </div>
+          </div>
+
+          <button class="btn-primary" onclick="app.savePublicProfile()">
+            <i class="bi bi-check-lg"></i> Save Identity
+          </button>
+        </div>
+      </div>
+
+      <div class="profile-section">
+        <h2 class="section-title">Data Management</h2>
+        <div class="liquid-glass settings-panel">
+          <div class="data-actions">
+            <button class="btn-primary" onclick="app.exportData()">
+              <i class="bi bi-download"></i> Archive Universe
+            </button>
+            <button class="btn-secondary" onclick="app.importData()">
+              <i class="bi bi-upload"></i> Restore Universe
+            </button>
+            <button class="btn-danger" onclick="app.resetData()">
+              <i class="bi bi-trash3"></i> Big Bang Reset
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== MOBILE NAVIGATION ==================== -->
+    <nav class="mobile-nav" id="mobileNav">
+      <button class="mobile-nav-item active" data-page="home" onclick="router.navigate('home')">
+        <i class="bi bi-house"></i><span>Home</span>
+      </button>
+      <button class="mobile-nav-item" data-page="study" onclick="router.navigate('study')">
+        <i class="bi bi-book"></i><span>Study</span>
+      </button>
+      <button class="mobile-nav-item" data-page="collection" onclick="router.navigate('collection')">
+        <i class="bi bi-stars"></i><span>Items</span>
+      </button>
+      <button class="mobile-nav-item" data-page="universe" onclick="router.navigate('universe')">
+        <i class="bi bi-globe"></i><span>Cosmos</span>
+      </button>
+      <button class="mobile-nav-item" data-page="profile" onclick="router.navigate('profile')">
+        <i class="bi bi-person"></i><span>You</span>
+      </button>
+    </nav>
+
+    <!-- ==================== DISCOVERY FOOTER CAROUSEL (from index 1 - the working one) ==================== -->
+    <div class="discovery-footer floating-footer" id="discovery-footer">
+      <div class="discovery-footer-label footer-label">
+        <i class="bi bi-stars"></i> Things waiting to be discovered
+      </div>
+      <div class="carousel-track footer-track" id="footerTrack">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+
+  </div><!-- /app-container -->
+
+  <!-- ==================== ADD TASK MODAL ==================== -->
+  <div class="modal-overlay" id="modal-add-task">
+    <div class="modal liquid-glass-strong">
+      <div class="modal-header">
+        <h2 class="modal-title">New Mission</h2>
+        <button class="modal-close" onclick="app.closeAddTaskModal()">×</button>
+      </div>
+      <form onsubmit="app.submitTask(event)">
+        <div class="form-group">
+          <label class="form-label">Mission Title</label>
+          <input type="text" class="form-input" id="task-title" placeholder="What do you need to do?" required>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Subject</label>
+            <input type="text" class="form-input" id="task-subject" placeholder="e.g. Mathematics">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Difficulty</label>
+            <select class="form-select" id="task-difficulty">
+              <option value="easy">Easy — A gentle orbit</option>
+              <option value="medium" selected>Medium — A steady journey</option>
+              <option value="hard">Hard — A deep dive into the unknown</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Estimated Time (min)</label>
+            <input type="number" class="form-input" id="task-time" placeholder="30" min="1" value="30">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Due Date</label>
+            <input type="date" class="form-input" id="task-due">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Category</label>
+          <select class="form-select" id="task-category">
+            <option value="study">Study</option>
+            <option value="work">Work</option>
+            <option value="creative">Creative</option>
+            <option value="health">Health</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+        <button type="submit" class="btn-primary" style="width:100%;justify-content:center;">
+          <i class="bi bi-plus-lg"></i> Chart Mission
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== ITEM DETAIL MODAL ==================== -->
+  <div class="modal-overlay" id="modal-item-detail">
+    <div class="modal liquid-glass-strong" style="max-width:480px;">
+      <div class="modal-header">
+        <div></div>
+        <button class="modal-close" onclick="app.closeItemDetail()">×</button>
+      </div>
+      <div id="item-detail-content"></div>
+    </div>
+  </div>
+
+  <!-- ==================== USER PROFILE MODAL ==================== -->
+  <div class="modal-overlay" id="modal-user-profile">
+    <div class="modal liquid-glass-strong modal-scrollable" style="max-width:600px;">
+      <div class="modal-header">
+        <div></div>
+        <button class="modal-close" onclick="app.closeUserProfile()">×</button>
+      </div>
+      <div id="user-profile-content"></div>
+    </div>
+  </div>
+
+  <!-- ==================== 3D VIEWER MODAL ==================== -->
+  <div class="modal-overlay" id="modal-3d-viewer">
+    <div class="modal liquid-glass-strong viewer-modal modal-scrollable">
+      <div class="modal-header">
+        <h2 class="modal-title" id="viewer-title">Artifact Viewer</h2>
+        <button class="modal-close" onclick="viewer3D.close()">×</button>
+      </div>
+      <div class="viewer-container" id="viewer-container">
+        <div class="viewer-placeholder" id="viewer-placeholder">
+          <i class="bi bi-box"></i>
+          <p>3D Model Placeholder</p>
+          <span class="viewer-hint">Drop .glb files in /models/ to load artifacts</span>
+        </div>
+        <div class="viewer-effects">
+          <div class="nebula-burst nb-1"></div>
+          <div class="nebula-burst nb-2"></div>
+          <div class="nebula-burst nb-3"></div>
+        </div>
+      </div>
+      <div class="viewer-info" id="viewer-info"></div>
+    </div>
+  </div>
+
+  <!-- ==================== DISCOVERY OVERLAY ==================== -->
+  <div class="discovery-overlay" id="discovery-overlay">
+    <div class="discovery-particles" id="discovery-particles"></div>
+    <div class="discovery-label" id="discovery-label">✦ Discovery Found ✦</div>
+    <div class="discovery-card liquid-glass-strong" id="discovery-card">
+      <span class="discovery-icon" id="discovery-icon"><i class="bi bi-gift"></i></span>
+      <div class="discovery-name" id="discovery-name">Unknown</div>
+      <div class="discovery-rarity" id="discovery-rarity">COMMON</div>
+      <div class="discovery-category" id="discovery-category">Object</div>
+      <div class="discovery-lore" id="discovery-lore">...</div>
+      <button class="discovery-btn" onclick="discovery.close()">
+        <i class="bi bi-stars"></i> Claim for Your Universe
+      </button>
+    </div>
+  </div>
+
+  <!-- ==================== TOAST CONTAINER ==================== -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- ==================== HIDDEN FILE INPUT ==================== -->
+  <input type="file" id="import-file" accept=".json" style="display:none" onchange="app.handleImport(event)">
+
+  <!-- Scripts -->
+  <script src="data/items.js"></script>
+  <script src="data/users.js"></script>
+  <script src="data/poetry.js"></script>
+  <script src="app.js"></script>
+
+  <!-- ==================== AUTH / ONBOARDING MODAL ==================== -->
+  <div class="modal-overlay auth-overlay" id="modal-auth">
+    <div class="modal liquid-glass-strong auth-modal">
+      <div class="auth-header">
+        <div class="auth-logo">🪐</div>
+        <h2 class="auth-title">Who are you, traveler?</h2>
+        <p class="auth-sub">Before you enter the cosmos, the universe needs to know your name.</p>
+      </div>
+      <form onsubmit="app.completeAuth(event)">
+        <div class="form-group">
+          <label class="form-label">Display Name</label>
+          <input type="text" class="form-input" id="auth-name" placeholder="How the cosmos knows you" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Cosmic Handle</label>
+          <div class="handle-input-wrap">
+            <span class="handle-prefix">@</span>
+            <input type="text" class="form-input" id="auth-handle" placeholder="your_handle" style="padding-left:28px;" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Universe Name</label>
+          <input type="text" class="form-input" id="auth-universe" placeholder="Name your world" required>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Bio</label>
+          <textarea class="form-textarea" id="auth-bio" placeholder="Tell the multiverse who you are..." rows="3"></textarea>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Cosmic Signature</label>
+          <div class="accent-picker auth-accent-picker">
+            <button type="button" onclick="app.setAuthAccent('#65e9ff')" data-accent="#65e9ff" style="background:#65e9ff"></button>
+            <button type="button" onclick="app.setAuthAccent('#b46cff')" data-accent="#b46cff" style="background:#b46cff"></button>
+            <button type="button" onclick="app.setAuthAccent('#ff5ac8')" data-accent="#ff5ac8" style="background:#ff5ac8"></button>
+            <button type="button" onclick="app.setAuthAccent('#ffb76b')" data-accent="#ffb76b" style="background:#ffb76b"></button>
+            <button type="button" onclick="app.setAuthAccent('#c7ff75')" data-accent="#c7ff75" style="background:#c7ff75"></button>
+            <button type="button" onclick="app.setAuthAccent('#7b7cff')" data-accent="#7b7cff" style="background:#7b7cff"></button>
+          </div>
+        </div>
+        <button type="submit" class="btn-primary" style="width:100%;justify-content:center;margin-top:8px;">
+          <i class="bi bi-stars"></i> Enter the Cosmos
+        </button>
+      </form>
+    </div>
+  </div>
+
+</body>
+</html>
